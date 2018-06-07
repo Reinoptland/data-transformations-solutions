@@ -47,43 +47,33 @@ const getDistinctNationalityNumber = (nationalityArray) => {
   return unique.length
 }
 
-const bookClubNationalities = getMemberNationalities(clubs[2])
 
 const diversityratingClubs = clubs.map(club => {
   const nationalities = getMemberNationalities(club)
   const diversityRating = getDistinctNationalityNumber(nationalities)
   return {
-    name: club.name,
-    diversityRating: diversityRating
+    club,
+    diversityRating
   }
 })
 
-
-const mostDiverseClubs = diversityratingClubs.reduce(( accumulator, club ) => {
-  if (club.diversityRating === accumulator[0].diversityRating) {
-    accumulator.push(club)
+const mostDiverseClubs = diversityratingClubs.reduce(( accumulator, clubWithRating ) => {
+  if (clubWithRating.diversityRating === accumulator.diversityRating) {
+    accumulator.clubs.push(clubWithRating.club)
   }
 
-  if (club.diversityRating > accumulator[0].diversityRating) {
-    accumulator = [ club ]
+  if (clubWithRating.diversityRating > accumulator.diversityRating) {
+    accumulator.diversityRating = clubWithRating.diversityRating
+    accumulator.clubs = [ clubWithRating.club ]
   }
 
   return accumulator
-}, [ { name: 'KKK', diversityRating: 0 } ])
-
-
-// 2 clubs => [ { name: 'Book Club', diversityRating: 4 }, { name: 'Food Club', diversityRating: 4 } ]
-// 2 clubs with members
-
-const finalStuffTired = mostDiverseClubs.map(club => {
-  return clubs.find(group => club.name === group.name)
+}, {
+  diversityRating: 0,
+  clubs: []
 })
 
-console.log(finalStuffTired);
-
-// We want to count how many distinct nationalities are in club X
-// Then we want to compare the nationalities count of different clubs
-// Return the club(s), with the highest count
+console.log(mostDiverseClubs.clubs);
 
 const output = [
   { name: 'Book Club', members: [ 9, 3, 6, 2 ] },
