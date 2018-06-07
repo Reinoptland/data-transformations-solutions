@@ -1,0 +1,14 @@
+{
+  "name": "data-transformations",
+  "version": "1.0.0",
+  "description": "Some examples",
+  "main": "index.js",
+  "author": "Me",
+  "license": "MIT",
+  "dependencies": {
+    "jest": "^23.1.0"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
