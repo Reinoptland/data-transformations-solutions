@@ -1,81 +1,35 @@
-const people = [
-    {id: 1, name: 'James', nationality: 'GB'},
-    {id: 2, name: 'Adam', nationality: 'CA'},
-    {id: 3, name: 'Larry', nationality: 'US'},
-    {id: 4, name: 'Fred', nationality: 'NL'},
-    {id: 5, name: 'Anna', nationality: 'NL'},
-    {id: 6, name: 'Emily', nationality: 'DE'},
-    {id: 7, name: 'Lenny', nationality: 'US'},
-    {id: 8, name: 'Cara', nationality: 'NL'},
-    {id: 9, name: 'Nathalie', nationality: 'NL'},
-]
+const getMemberNationality = (memberId, collection) => collection // 1, Array of people
+  .find(member => memberId === member.id) // {id: 1, name: 'James', nationality: 'GB'}
+  .nationality // 'GB'
 
-const clubs = [
-    {name: 'Book Club', members: [9,3,6,2]},
-    {name: 'Auto Club', members: [1,2,3]},
-    {name: 'Country Club', members: [7,5,8]},
-    {name: 'Food Club', members: [5,1,6,7]},
-    {name: 'Yoga Club', members: [1,4,5,3,7]},
-    {name: 'Garage Band', members: [1,3,8,9]},
-    {name: 'Pool Club', members: [6,4,5,8,9]},
-]
+const isDistinctElementOfArray = (value, index, self) => self.indexOf(value) === index
 
-// find
-// map -> transform a collection
-// filter
-// reduce -> reduce collection to a number
+const addDinstinctNationalityCount = (club, people) => {
+  const distinctNationalityCount = club.members // [ 1, 2, 3]
+    .map(memberId => getMemberNationality(memberId, people)) // [ 'NL', 'GB', 'NL'] etc
+    .filter(isDistinctElementOfArray) // ['NL', 'GB']
+    .length // 2
 
-// iterate over the members of a club, to see what nationality they have
-// ['NL', 'US', 'NL', 'GB']
-// ['NL', 'US', 'NL', 'GB']
-
-const getMemberNationalities = (group) => {
-  return group.members.map(member => {
-    const peopleObject = people.find(person => member === person.id)
-    return peopleObject.nationality
-  })
+  return { club, distinctNationalityCount } // { club: { name: 'some club', members: [1,2,3] }, distinctNationalityCount: 2 }
 }
 
-const getDistinctNationalityNumber = (nationalityArray) => {
-  const unique = nationalityArray.filter(function onlyUnique(value, index, self) {
-    // self.indexOf('NL') ['GB', 'NL', 'NL']
-    // self.indexOf('NL') 1 === index 1
-    // self.indexOf('NL') 1 === index 2
-    return self.indexOf(value) === index;
-  })
-
-  return unique.length
-}
-
-
-const diversityratingClubs = clubs.map(club => {
-  const nationalities = getMemberNationalities(club)
-  const diversityRating = getDistinctNationalityNumber(nationalities)
-  return {
-    club,
-    diversityRating
-  }
-})
-
-const mostDiverseClubs = diversityratingClubs.reduce(( accumulator, clubWithRating ) => {
-  if (clubWithRating.diversityRating === accumulator.diversityRating) {
+const selectMostDiverseClubs = (accumulator, clubWithRating ) => {
+  if (clubWithRating.distinctNationalityCount === accumulator.distinctNationalityCount) {
     accumulator.clubs.push(clubWithRating.club)
   }
 
-  if (clubWithRating.diversityRating > accumulator.diversityRating) {
-    accumulator.diversityRating = clubWithRating.diversityRating
+  if (clubWithRating.distinctNationalityCount > accumulator.distinctNationalityCount) {
+    accumulator.distinctNationalityCount = clubWithRating.distinctNationalityCount
     accumulator.clubs = [ clubWithRating.club ]
   }
 
   return accumulator
-}, {
-  diversityRating: 0,
-  clubs: []
-})
+}
 
-console.log(mostDiverseClubs.clubs);
+const getTheMostDiverseClubs = (clubs, people) => { // Array of clubs and arrau of people
+    .map(club => addDinstinctNationalityCount(club, people)) // [{ club: { name: 'some club', members: [1,2,3] }, distinctNationalityCount: 2 }, ]
+    .reduce(selectMostDiverseClubs, { distinctNationalityCount: 0, clubs: []}) // { distinctNationalityCount: 2, clubs: [{ name: 'some club', members: [1,2,3]}]}
+    .clubs // [{ name: 'some club', members: [1,2,3]}]
+}
 
-const output = [
-  { name: 'Book Club', members: [ 9, 3, 6, 2 ] },
-  { name: 'Food Club', members: [ 5, 1, 6, 7 ] }
-]
+module.exports = getTheMostDiverseClubs
